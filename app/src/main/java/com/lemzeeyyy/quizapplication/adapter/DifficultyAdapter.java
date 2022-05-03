@@ -42,7 +42,7 @@ public class DifficultyAdapter extends BaseAdapter {
             view1 = view;
         view1.setOnClickListener(view2 -> {
             Intent intent = new Intent(viewGroup.getContext(), QuestionsActivity.class);
-            intent.putExtra("DIFFICULTY",i+1);
+            intent.putExtra("DIFFICULTY","Difficulty: "+String.valueOf(i+1));
             viewGroup.getContext().startActivity(intent);
         });
         ((TextView)view1.findViewById(R.id.difficultyTVID)).setText(String.valueOf(1+i));
