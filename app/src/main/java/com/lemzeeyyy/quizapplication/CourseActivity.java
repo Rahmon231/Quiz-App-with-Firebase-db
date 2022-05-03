@@ -30,7 +30,7 @@ public class CourseActivity extends AppCompatActivity {
         catList.add("Course 2");
         catList.add("Course 3");
         catList.add("Course 4");
-        CourseAdapter adapter = new CourseAdapter(catList);
+        CourseAdapter adapter = new CourseAdapter(catList,CourseActivity.this);
         courseGrid.setAdapter(adapter);
 
     }

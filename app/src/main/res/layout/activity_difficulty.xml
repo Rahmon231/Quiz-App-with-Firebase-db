@@ -1,9 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".DifficultyActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/setToolbarId"
+        android:background="@color/purple_500"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Difficulty"
+        android:id="@+id/diffText"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        />
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:horizontalSpacing="16dp"
+        android:verticalSpacing="16dp"
+        android:padding="16dp"
+        android:gravity="center"
+        android:id="@+id/diffGridViewID"
+        android:columnWidth="100dp"
+        android:numColumns="auto_fit"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

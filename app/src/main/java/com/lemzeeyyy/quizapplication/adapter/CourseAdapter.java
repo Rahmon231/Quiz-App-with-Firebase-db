@@ -1,6 +1,5 @@
 package com.lemzeeyyy.quizapplication.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,7 +19,7 @@ public class CourseAdapter extends BaseAdapter {
     private Context context;
     private List<String> catList;
 
-    public CourseAdapter(List<String> catList) {
+    public CourseAdapter(List<String> catList, Context context) {
         this.catList = catList;
         this.context = context;
     }
@@ -51,9 +50,10 @@ public class CourseAdapter extends BaseAdapter {
 
         view1.setOnClickListener(view2 -> {
             Intent intent = new Intent(viewGroup.getContext(), DifficultyActivity.class);
-            intent.putExtra("CATEGORY",catList.get(i));
+            intent.putExtra("COURSES",catList.get(i));
             viewGroup.getContext().startActivity(intent);
         });
+
         ((TextView) view1.findViewById(R.id.courseNameID)).setText(catList.get(i));
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(255),rnd.nextInt(255),rnd.nextInt(255));
