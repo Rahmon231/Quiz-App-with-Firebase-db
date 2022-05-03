@@ -22,12 +22,9 @@ public class MainActivity extends AppCompatActivity {
         ma_startBtn = findViewById(R.id.ma_startBtnID);
         Typeface typeface = ResourcesCompat.getFont(this,R.font.blacklist);
         titleTV.setTypeface(typeface);
-        ma_startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,CourseActivity.class);
-                startActivity(intent);
-            }
+        ma_startBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this,CourseActivity.class);
+            startActivity(intent);
         });
     }
 }
