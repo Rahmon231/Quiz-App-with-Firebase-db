@@ -62,14 +62,15 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         option3.setOnClickListener(this);
         option4.setOnClickListener(this);
         score = 0 ;
+        getQuestionsList();
     }
 
     private void getQuestionsList(){
         questionList = new ArrayList<>();
         questionList.add(new Question("Question 1", "OptA","OptB", "OptC","OptD",2));
-        questionList.add(new Question("Question 1", "OptB","OptA", "OptC","OptD",1));
-        questionList.add(new Question("Question 1", "OptC","OptB", "OptA","OptD",3));
-        questionList.add(new Question("Question 1", "OptD","OptB", "OptC","OptA",4));
+        questionList.add(new Question("Question 2", "OptB","OptA", "OptC","OptD",1));
+        questionList.add(new Question("Question 3", "OptC","OptB", "OptA","OptD",3));
+        questionList.add(new Question("Question 4", "OptD","OptB", "OptC","OptA",4));
 
         setQuestion();
     }
@@ -92,7 +93,6 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
             public void onTick(long l) {
                 if(l<10000)
                     timerTV.setText(String.valueOf(l/1000));
-
             }
 
             @Override
@@ -142,6 +142,7 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
 
 
             switch (questionList.get(questNum).getCorrectAns()){
+                //check correct option and change button background to green
                 case 1:
                     option1.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
                     break;
@@ -163,7 +164,6 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
                 changeQuestion();
             }
         },2000);
-
     }
     private void changeQuestion(){
         if(questNum < questionList.size() - 1){
@@ -183,8 +183,9 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
             //display score in score activity
             Intent intent = new Intent(QuestionsActivity.this, ScoreActivity.class);
             intent.putExtra("SCORE",String.valueOf(score)+"/"+String.valueOf(questionList.size()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            QuestionsActivity.this.finish();
+            //QuestionsActivity.this.finish();
         }
 
     }
@@ -237,5 +238,11 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
 
                     }
                 });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        countDownTimer.cancel();
     }
 }
