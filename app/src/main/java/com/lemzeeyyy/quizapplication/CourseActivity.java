@@ -11,8 +11,6 @@ import android.widget.GridView;
 
 import com.lemzeeyyy.quizapplication.adapter.CourseAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class CourseActivity extends AppCompatActivity {
     private GridView courseGrid;

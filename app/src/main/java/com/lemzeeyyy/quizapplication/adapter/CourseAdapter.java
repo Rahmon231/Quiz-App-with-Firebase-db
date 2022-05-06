@@ -51,6 +51,7 @@ public class CourseAdapter extends BaseAdapter {
         view1.setOnClickListener(view2 -> {
             Intent intent = new Intent(viewGroup.getContext(), DifficultyActivity.class);
             intent.putExtra("COURSES",catList.get(i));
+            intent.putExtra("CATEGORY_ID",i+1);
             viewGroup.getContext().startActivity(intent);
         });
 

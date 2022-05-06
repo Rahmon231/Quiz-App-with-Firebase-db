@@ -11,15 +11,15 @@ import com.lemzeeyyy.quizapplication.QuestionsActivity;
 import com.lemzeeyyy.quizapplication.R;
 
 public class DifficultyAdapter extends BaseAdapter {
-    private int num_of_sets;
+    private int num_of_levels;
 
     public DifficultyAdapter(int num_of_sets) {
-        this.num_of_sets = num_of_sets;
+        this.num_of_levels = num_of_sets;
     }
 
     @Override
     public int getCount() {
-        return num_of_sets;
+        return num_of_levels;
     }
 
     @Override
