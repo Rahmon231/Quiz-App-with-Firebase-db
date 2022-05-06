@@ -32,6 +32,8 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
     private int correctSound;
     private int wrongSound;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -15,14 +15,22 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SplashActivity extends AppCompatActivity {
     private TextView appName;
+    public static List<String> catList = new ArrayList<>();
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         appName = findViewById(R.id.appName);
+        firestore = FirebaseFirestore.getInstance();
 
         Typeface typeface = ResourcesCompat.getFont(this,R.font.blacklist);
         appName.setTypeface(typeface);
@@ -33,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    sleep(3000);
+                    loadDate();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -42,5 +50,9 @@ public class SplashActivity extends AppCompatActivity {
             }
         }).start();
 
+    }
+
+    private void loadDate() {
+        catList.clear();
     }
 }
