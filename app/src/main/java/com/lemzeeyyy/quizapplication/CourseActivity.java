@@ -1,5 +1,7 @@
 package com.lemzeeyyy.quizapplication;
 
+import static com.lemzeeyyy.quizapplication.SplashActivity.catList;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -25,11 +27,6 @@ public class CourseActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Courses");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        List<String> catList = new ArrayList<>();
-        catList.add("Course 1");
-        catList.add("Course 2");
-        catList.add("Course 3");
-        catList.add("Course 4");
         CourseAdapter adapter = new CourseAdapter(catList,CourseActivity.this);
         courseGrid.setAdapter(adapter);
 

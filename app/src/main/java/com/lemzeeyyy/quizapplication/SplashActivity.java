@@ -2,6 +2,7 @@ package com.lemzeeyyy.quizapplication;
 
 import static java.lang.Thread.sleep;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -14,7 +15,11 @@ import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -40,13 +45,8 @@ public class SplashActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    loadDate();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(SplashActivity.this,MainActivity.class);
-                startActivity(intent);
+              loadDate();
+
             }
         }).start();
 
@@ -54,5 +54,30 @@ public class SplashActivity extends AppCompatActivity {
 
     private void loadDate() {
         catList.clear();
+        firestore.collection("QUIZ").document("Categories")
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        long count = (long)doc.get("COUNT");
+                        for (int i = 1; i <= count; i++) {
+                            String catName = doc.getString("CAT"+String.valueOf(i));
+                            catList.add(catName);
+                        }
+                        Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                        startActivity(intent);
+                        SplashActivity.this.finish();
+                    }else {
+                        Toast.makeText(SplashActivity.this, "no category document", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }else {
+                    Toast.makeText(SplashActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 }
