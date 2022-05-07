@@ -6,9 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,7 @@ public class DifficultyActivity extends AppCompatActivity {
     private GridView diffGrid;
     private FirebaseFirestore firestore;
     private int category_id;
+    private Dialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +40,14 @@ public class DifficultyActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         difficulty = findViewById(R.id.diffText);
         diffGrid = findViewById(R.id.diffGridViewID);
+        loadingDialog = new Dialog(DifficultyActivity.this);
+        loadingDialog.setContentView(R.layout.loadingprogressbar);
+        loadingDialog.setCancelable(false);
+        loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progressbackground);
+        loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        loadingDialog.show();
         firestore = FirebaseFirestore.getInstance();
         loadDifficulty();
-        DifficultyAdapter adapter = new DifficultyAdapter(4);
-        diffGrid.setAdapter(adapter);
-
     }
 
     private void loadDifficulty() {
@@ -52,19 +58,20 @@ public class DifficultyActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     DocumentSnapshot doc = task.getResult();
                     if(doc.exists()){
-                        long count = (long)doc.get("DIFFICULTY");
+                        long diff_level = (long)doc.get("DIFFICULTY");
+                        DifficultyAdapter adapter = new DifficultyAdapter((int) diff_level);
+                        diffGrid.setAdapter(adapter);
 
                     }else {
-                        Toast.makeText(SplashActivity.this, "no category document", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DifficultyActivity.this, "no category document", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }else {
-                    Toast.makeText(SplashActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DifficultyActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
-
+                loadingDialog.cancel();
             }
         });
-    }
     }
 
     @Override
