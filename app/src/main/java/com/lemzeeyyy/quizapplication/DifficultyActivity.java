@@ -25,7 +25,7 @@ public class DifficultyActivity extends AppCompatActivity {
     private TextView difficulty;
     private GridView diffGrid;
     private FirebaseFirestore firestore;
-    private int category_id;
+    public static int category_id;
     private Dialog loadingDialog;
 
     @Override

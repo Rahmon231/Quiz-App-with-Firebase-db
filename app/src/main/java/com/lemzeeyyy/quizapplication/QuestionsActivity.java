@@ -1,5 +1,7 @@
 package com.lemzeeyyy.quizapplication;
 
+import static com.lemzeeyyy.quizapplication.DifficultyActivity.category_id;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.Animator;
@@ -15,6 +17,8 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.lemzeeyyy.quizapplication.model.Question;
 
 import java.util.ArrayList;
@@ -31,13 +35,15 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
     private SoundPool soundPool;
     private int correctSound;
     private int wrongSound;
-
+    private FirebaseFirestore firestore;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
+        firestore = FirebaseFirestore.getInstance();
+        firestore.collection("QUIZ").document("CAT" +String.valueOf(category_id));
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
@@ -69,10 +75,6 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
 
     private void getQuestionsList(){
         questionList = new ArrayList<>();
-        questionList.add(new Question("Question 1", "OptA","OptB", "OptC","OptD",2));
-        questionList.add(new Question("Question 2", "OptB","OptA", "OptC","OptD",1));
-        questionList.add(new Question("Question 3", "OptC","OptB", "OptA","OptD",3));
-        questionList.add(new Question("Question 4", "OptD","OptB", "OptC","OptA",4));
 
         setQuestion();
     }
