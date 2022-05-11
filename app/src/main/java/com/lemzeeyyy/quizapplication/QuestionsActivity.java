@@ -2,9 +2,11 @@ package com.lemzeeyyy.quizapplication;
 
 import static com.lemzeeyyy.quizapplication.DifficultyActivity.category_id;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.Animator;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -14,11 +16,19 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.lemzeeyyy.quizapplication.adapter.DifficultyAdapter;
 import com.lemzeeyyy.quizapplication.model.Question;
 
 import java.util.ArrayList;
@@ -36,6 +46,8 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
     private int correctSound;
     private int wrongSound;
     private FirebaseFirestore firestore;
+    private int diffLevel;
+    private Dialog loadingDialog;
 
 
     @Override
@@ -43,7 +55,8 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection("QUIZ").document("CAT" +String.valueOf(category_id));
+        firestore.collection("QUIZ").document("CAT" +String.valueOf(category_id))
+                .collection("DIFFICULTY");
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
@@ -55,6 +68,12 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         correctSound = soundPool.load(this,R.raw.correct,1);
         wrongSound = soundPool.load(this,R.raw.defeat_two,1);
         difficulty = findViewById(R.id.showDiff);
+        loadingDialog = new Dialog(QuestionsActivity.this);
+        loadingDialog.setContentView(R.layout.loadingprogressbar);
+        loadingDialog.setCancelable(false);
+        loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progressbackground);
+        loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        loadingDialog.show();
         Intent intent = getIntent();
         difficulty.setText(intent.getStringExtra("DIFFICULTY"));
         questionTV = findViewById(R.id.questionsID);
@@ -70,14 +89,37 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         option3.setOnClickListener(this);
         option4.setOnClickListener(this);
         score = 0 ;
+        diffLevel = getIntent().getIntExtra("DIFF_LEVEL",1);
+
         getQuestionsList();
     }
 
     private void getQuestionsList(){
         questionList = new ArrayList<>();
+        firestore.collection("QUIZ").document("CAT"+String.valueOf(category_id))
+                .collection("DIFFICULTY"+String.valueOf(diffLevel))
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    QuerySnapshot questions = task.getResult();
+                    for(QueryDocumentSnapshot doc : questions){
+                        questionList.add(new Question(doc.getString("QUESTION"),
+                                doc.getString("A"),
+                                doc.getString("B"),
+                                doc.getString("C"),
+                                doc.getString("D"),
+                                Integer.valueOf("ANSWER")));
+                    }
 
+                }else {
+                    Toast.makeText(QuestionsActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                loadingDialog.cancel();
+            }
+        });
         setQuestion();
-    }
+            }
     private void setQuestion(){
         timerTV.setText(String.valueOf(10));
         questionTV.setText(questionList.get(0).getQuestion());
