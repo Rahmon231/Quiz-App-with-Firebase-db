@@ -11,15 +11,17 @@ import android.widget.TextView;
 
 import com.lemzeeyyy.quizapplication.DifficultyActivity;
 import com.lemzeeyyy.quizapplication.R;
+import com.lemzeeyyy.quizapplication.SplashActivity;
+import com.lemzeeyyy.quizapplication.model.CourseModel;
 
 import java.util.List;
 import java.util.Random;
 
 public class CourseAdapter extends BaseAdapter {
     private Context context;
-    private List<String> catList;
+    private List<CourseModel> catList;
 
-    public CourseAdapter(List<String> catList, Context context) {
+    public CourseAdapter(List<CourseModel> catList, Context context) {
         this.catList = catList;
         this.context = context;
     }
@@ -49,13 +51,14 @@ public class CourseAdapter extends BaseAdapter {
             view1 = view;
 
         view1.setOnClickListener(view2 -> {
+            SplashActivity.selectedCourseIndex = i;
             Intent intent = new Intent(viewGroup.getContext(), DifficultyActivity.class);
-            intent.putExtra("COURSES",catList.get(i));
-            intent.putExtra("CATEGORY_ID",i+1);
+//            intent.putExtra("COURSES",catList.get(i).getCourseName());
+//            intent.putExtra("CATEGORY_ID",i+1);
             viewGroup.getContext().startActivity(intent);
         });
 
-        ((TextView) view1.findViewById(R.id.courseNameID)).setText(catList.get(i));
+        ((TextView) view1.findViewById(R.id.courseNameID)).setText(catList.get(i).getCourseName());
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(255),rnd.nextInt(255),rnd.nextInt(255));
         view1.setBackgroundColor(color);

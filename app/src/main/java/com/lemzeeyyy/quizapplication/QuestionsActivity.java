@@ -1,6 +1,9 @@
 package com.lemzeeyyy.quizapplication;
 
-import static com.lemzeeyyy.quizapplication.DifficultyActivity.category_id;
+
+import static com.lemzeeyyy.quizapplication.DifficultyActivity.difficultyIDs;
+import static com.lemzeeyyy.quizapplication.SplashActivity.catList;
+import static com.lemzeeyyy.quizapplication.SplashActivity.selectedCourseIndex;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +18,8 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.ArrayMap;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -23,22 +28,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.lemzeeyyy.quizapplication.adapter.DifficultyAdapter;
-import com.lemzeeyyy.quizapplication.model.Question;
+
+import com.lemzeeyyy.quizapplication.model.QuestionModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class QuestionsActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView questionTV, qCountTV, timerTV,difficulty ;
     private Button option1, option2, option3, option4 ;
-    private List<Question> questionList;
+    private List<QuestionModel> questionList;
     private  int questNum;
     private CountDownTimer countDownTimer;
     private int score;
@@ -54,9 +63,6 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
-        firestore = FirebaseFirestore.getInstance();
-        firestore.collection("QUIZ").document("CAT" +String.valueOf(category_id))
-                .collection("DIFFICULTY");
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
@@ -74,8 +80,9 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progressbackground);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         loadingDialog.show();
+        questionList = new ArrayList<>();
         Intent intent = getIntent();
-        difficulty.setText(intent.getStringExtra("DIFFICULTY"));
+        difficulty.setText("Difficulty "+intent.getIntExtra("DIFF_LEVEL",1));
         questionTV = findViewById(R.id.questionsID);
         qCountTV = findViewById(R.id.questionNumberID);
         timerTV = findViewById(R.id.countDownTimerID);
@@ -90,36 +97,54 @@ public class QuestionsActivity extends AppCompatActivity implements View.OnClick
         option4.setOnClickListener(this);
         score = 0 ;
         diffLevel = getIntent().getIntExtra("DIFF_LEVEL",1);
-
+        firestore = FirebaseFirestore.getInstance();
         getQuestionsList();
     }
 
     private void getQuestionsList(){
-        questionList = new ArrayList<>();
-        firestore.collection("QUIZ").document("CAT"+String.valueOf(category_id))
-                .collection("DIFFICULTY"+String.valueOf(diffLevel))
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        questionList.clear();
+        firestore.collection("QUIZ").document(catList.get(selectedCourseIndex).getCourseId())
+                .collection(difficultyIDs.get(diffLevel))
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    QuerySnapshot questions = task.getResult();
-                    for(QueryDocumentSnapshot doc : questions){
-                        questionList.add(new Question(doc.getString("QUESTION"),
-                                doc.getString("A"),
-                                doc.getString("B"),
-                                doc.getString("C"),
-                                doc.getString("D"),
-                                Integer.valueOf("ANSWER")));
-                    }
-
-                }else {
-                    Toast.makeText(QuestionsActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Map<String,QueryDocumentSnapshot> docList = new ArrayMap<>();
+                for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
+                    docList.put(doc.getId(),doc);
                 }
-                loadingDialog.cancel();
+                QueryDocumentSnapshot quesListDoc = docList.get("QUESTION_LIST");
+                Log.d("QuestionDocList", "onSuccess: "+quesListDoc.get("COUNT"));
+                Log.d("QUestionDocList", "onSuccess: "+quesListDoc.getString("Q1_ID"));
+                String count = quesListDoc.getString("COUNT");
+                Log.d("TAG", "onSuccess: "+Integer.valueOf(count));
+                for(int i = 0 ; i < Integer.valueOf(count) ; i++ ){
+                    String quesId = quesListDoc.getString("Q"+(i+1)+"_ID");
+                    QueryDocumentSnapshot quesDoc = docList.get(quesId);
+
+                    questionList.add(new QuestionModel(
+                            quesDoc.getString("QUESTION"),
+                            quesDoc.getString("A"),
+                            quesDoc.getString("B"),
+                            quesDoc.getString("C"),
+                            quesDoc.getString("D"),
+                            Integer.valueOf(quesDoc.getString("ANSWER"))
+                    ));
+
+                }
+                setQuestion();
+                loadingDialog.dismiss();
             }
-        });
-        setQuestion();
-            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(QuestionsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        loadingDialog.dismiss();
+                    }
+                });
+
+    }
+
     private void setQuestion(){
         timerTV.setText(String.valueOf(10));
         questionTV.setText(questionList.get(0).getQuestion());

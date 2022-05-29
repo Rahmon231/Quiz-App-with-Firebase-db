@@ -1,6 +1,7 @@
 package com.lemzeeyyy.quizapplication.adapter;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ public class DifficultyAdapter extends BaseAdapter {
             view1 = view;
         view1.setOnClickListener(view2 -> {
             Intent intent = new Intent(viewGroup.getContext(), QuestionsActivity.class);
-            intent.putExtra("DIFFICULTY","Difficulty: "+String.valueOf(i+1));
+            intent.putExtra("DIFF_LEVEL",(i));
             viewGroup.getContext().startActivity(intent);
         });
         ((TextView)view1.findViewById(R.id.difficultyTVID)).setText(String.valueOf(1+i));

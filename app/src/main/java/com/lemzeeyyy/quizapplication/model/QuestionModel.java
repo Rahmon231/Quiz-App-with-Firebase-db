@@ -1,6 +1,6 @@
 package com.lemzeeyyy.quizapplication.model;
 
-public class Question {
+public class QuestionModel {
     String question;
     String optionA;
     String optionB;
@@ -8,7 +8,7 @@ public class Question {
     String optionD;
     int correctAns;
 
-    public Question(String question, String optionA, String optionB, String optionC, String optionD, int correctAns) {
+    public QuestionModel(String question, String optionA, String optionB, String optionC, String optionD, int correctAns) {
         this.question = question;
         this.optionA = optionA;
         this.optionB = optionB;

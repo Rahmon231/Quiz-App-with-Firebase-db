@@ -21,13 +21,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.lemzeeyyy.quizapplication.model.CourseModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
     private TextView appName;
-    public static List<String> catList = new ArrayList<>();
+    public static List<CourseModel> catList = new ArrayList<>();
+    public static int selectedCourseIndex = 0 ;
     private FirebaseFirestore firestore;
 
     @Override
@@ -63,8 +65,9 @@ public class SplashActivity extends AppCompatActivity {
                     if(doc.exists()){
                         long count = (long)doc.get("COUNT");
                         for (int i = 1; i <= count; i++) {
-                            String catName = doc.getString("CAT"+String.valueOf(i));
-                            catList.add(catName);
+                            String courseName = doc.getString("CAT"+String.valueOf(i)+"_NAME");
+                            String courseId = doc.getString("CAT"+String.valueOf(i)+"_ID");
+                            catList.add(new CourseModel(courseName,courseId));
                         }
                         Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                         startActivity(intent);
